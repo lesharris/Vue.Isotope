@@ -44,7 +44,7 @@
         const children = this.children = []
         const removedIndex = this.removedIndex = []
 
-        rawChildren.forEach(elt => addClass(elt, this.itemSelector))
+        // rawChildren.forEach(elt => addClass(elt, this.itemSelector))
 
         for (let i = 0; i < rawChildren.length; i++) {
           const c = rawChildren[i]
@@ -227,7 +227,7 @@
 
       computed: {
         compiledOptions() {
-          const options = _.merge({}, this.options, { itemSelector: "." + this.itemSelector, isJQueryFiltering: false })
+          const options = _.merge({}, this.options, { isJQueryFiltering: false })
 
           _.forOwn(options.getSortData, (value, key) => {
             if (_.isString(value))

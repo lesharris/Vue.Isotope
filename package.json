@@ -20,8 +20,10 @@
     "test": "test"
   },
   "dependencies": {
+    "gulp": "^3.9.1",
     "isotope-layout": "^3.0.1",
-    "lodash": "^4.13.1"
+    "lodash": "^4.13.1",
+    "natives": "^1.1.6"
   },
   "devDependencies": {
     "babel-plugin-array-includes": "^2.0.3",
@@ -30,7 +32,6 @@
     "bower": "^1.7.9",
     "connect": "^3.4.1",
     "connect-livereload": "^0.5.4",
-    "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
     "gulp-clean": "^0.3.2",
     "gulp-filter": "^4.0.0",

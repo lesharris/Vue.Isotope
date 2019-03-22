@@ -1,5 +1,7 @@
 "use strict";
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 (function () {
@@ -42,17 +44,13 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
       props: props,
 
       render: function render(h) {
-        var _this = this;
-
         var map = {};
         var prevChildren = this.prevChildren = this.children;
         var rawChildren = this.$slots.default || [];
         var children = this.children = [];
         var removedIndex = this.removedIndex = [];
 
-        rawChildren.forEach(function (elt) {
-          return addClass(elt, _this.itemSelector);
-        });
+        // rawChildren.forEach(elt => addClass(elt, this.itemSelector))
 
         for (var i = 0; i < rawChildren.length; i++) {
           var c = rawChildren[i];
@@ -83,13 +81,13 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
         return h('div', null, displayChildren);
       },
       mounted: function mounted() {
-        var _this2 = this;
+        var _this = this;
 
         var options = _.merge({}, this.compiledOptions);
         var update = function update(object) {
           _.forOwn(object, function (value, key) {
             object[key] = function (itemElement) {
-              var res = getItemVm(itemElement);return value.call(_this2, res.vm, res.index);
+              var res = getItemVm(itemElement);return value.call(_this, res.vm, res.index);
             };
           });
         };
@@ -101,20 +99,20 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
         }
 
         this.$nextTick(function () {
-          _this2.link();
-          _this2.listen();
-          var iso = new Isotope(_this2.$el, options);
+          _this.link();
+          _this.listen();
+          var iso = new Isotope(_this.$el, options);
 
           iso._requestUpdate = function () {
             if (iso._willUpdate) return;
 
             iso._willUpdate = true;
-            _this2.$nextTick(function () {
+            _this.$nextTick(function () {
               iso.arrange();
               iso._willUpdate = false;
             });
           };
-          _this2.iso = iso;
+          _this.iso = iso;
         });
       },
       beforeDestroy: function beforeDestroy() {
@@ -130,7 +128,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
         this._oldChidren = Array.prototype.slice.call(this.$el.children);
       },
       updated: function updated() {
-        var _this3 = this;
+        var _this2 = this;
 
         if (!this.iso) {
           return;
@@ -139,7 +137,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
         var newChildren = [].concat(_toConsumableArray(this.$el.children));
         var added = _.difference(newChildren, this._oldChidren);
         var removed = this.removedIndex.map(function (index) {
-          return _this3.$el.children[index];
+          return _this2.$el.children[index];
         });
 
         this.cleanupNodes();
@@ -157,32 +155,32 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
       methods: {
         cleanupNodes: function cleanupNodes() {
-          var _this4 = this;
+          var _this3 = this;
 
           this.removedIndex.reverse();
           this.removedIndex.forEach(function (index) {
-            return _this4._vnode.children.splice(index, 1);
+            return _this3._vnode.children.splice(index, 1);
           });
         },
         link: function link() {
-          var _this5 = this;
+          var _this4 = this;
 
           var slots = this.$slots.default || [];
           slots.forEach(function (slot, index) {
             var elmt = slot.elm;
-            if (elmt) elmt.__underlying_element = { vm: _this5.list[index], index: index };
+            if (elmt) elmt.__underlying_element = { vm: _this4.list[index], index: index };
           });
         },
         listen: function listen() {
-          var _this6 = this;
+          var _this5 = this;
 
           this._listeners = _(this.compiledOptions.getSortData).map(function (sort) {
-            return _.map(_this6.list, function (collectionElement, index) {
-              return _this6.$watch(function () {
+            return _.map(_this5.list, function (collectionElement, index) {
+              return _this5.$watch(function () {
                 return sort(collectionElement);
               }, function () {
-                _this6.iso.updateSortData();
-                _this6.iso._requestUpdate();
+                _this5.iso.updateSortData();
+                _this5.iso._requestUpdate();
               });
             });
           }).flatten().value();
@@ -196,15 +194,15 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
           this.$emit("sort", name);
         },
         buildFilterFunction: function buildFilterFunction(name) {
-          var _this7 = this;
+          var _this6 = this;
 
           var filter = this._isotopeOptions.getFilterData[name];
           this._filterlistener = this.$watch(function () {
-            return _.map(_this7.list, function (el, index) {
-              return _this7.options.getFilterData[name](el, index);
+            return _.map(_this6.list, function (el, index) {
+              return _this6.options.getFilterData[name](el, index);
             });
           }, function () {
-            _this7.iso._requestUpdate();
+            _this6.iso._requestUpdate();
           });
           return filter;
         },
@@ -246,7 +244,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
       computed: {
         compiledOptions: function compiledOptions() {
-          var options = _.merge({}, this.options, { itemSelector: "." + this.itemSelector, isJQueryFiltering: false });
+          var options = _.merge({}, this.options, { isJQueryFiltering: false });
 
           _.forOwn(options.getSortData, function (value, key) {
             if (_.isString(value)) options.getSortData[key] = function (itemElement) {
@@ -262,7 +260,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
     return isotopeComponent;
   }
 
-  if (typeof exports == "object") {
+  if ((typeof exports === "undefined" ? "undefined" : _typeof(exports)) == "object") {
     var _ = require("lodash"),
         Isotope = require("isotope-layout");
     module.exports = buildVueIsotope(_, Isotope);
